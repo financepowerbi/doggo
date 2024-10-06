@@ -26,6 +26,25 @@ defmodule Doggo.Storybook.Accordion do
           expanded: :none
         },
         slots: slots()
+      },
+      %Variation{
+        id: :with_controls,
+        attributes: %{
+          id: "dog-breeds-with-controls",
+          expanded: :all,
+          show_controls: true
+        },
+        slots: slots()
+      },
+      %Variation{
+        id: :remember_state,
+        attributes: %{
+          id: "dog-breeds-remember-state",
+          expanded: :all,
+          show_controls: true,
+          remember_state: true
+        },
+        slots: slots()
       }
     ]
   end

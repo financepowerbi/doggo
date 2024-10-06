@@ -10,6 +10,8 @@ defmodule Doggo do
   alias Phoenix.HTML.Form
   alias Phoenix.LiveView.JS
 
+  import Phoenix.LiveView.JS
+
   @doc false
   def slide_label(n), do: "Slide #{n}"
 
@@ -217,20 +219,29 @@ defmodule Doggo do
     |> JS.set_attribute({"hidden", "hidden"}, to: other_panels)
   end
 
-  @doc false
-  def toggle_accordion_section(id, index)
-      when is_binary(id) and is_integer(index) do
-    %JS{}
-    |> JS.toggle_attribute({"aria-expanded", "true", "false"},
-      to: "##{id}-trigger-#{index}"
-    )
-    |> JS.toggle_attribute({"hidden", "hidden"},
-      to: "##{id}-section-#{index}"
-    )
+  def toggle_accordion_section(id, index, remember_state) do
+    JS.toggle(to: "##{id}-section-#{index}")
+    |> JS.toggle_attribute({"aria-expanded", "true", "false"}, to: "##{id}-trigger-#{index}")
+    |> maybe_save_accordion_state(remember_state, id)
   end
 
-  @doc false
-  def toggle_disclosure(target_id) when is_binary(target_id) do
+  def open_all_accordion_sections(id) do
+    JS.show(to: "##{id} .accordion-content")
+    |> JS.set_attribute({"aria-expanded", "true"}, to: "##{id} .accordion-trigger")
+  end
+
+  def close_all_accordion_sections(id) do
+    JS.hide(to: "##{id} .accordion-content")
+    |> JS.set_attribute({"aria-expanded", "false"}, to: "##{id} .accordion-trigger")
+  end
+
+  defp maybe_save_accordion_state(js, true, id) do
+    js |> JS.dispatch("accordion:save-state", to: "##{id}")
+  end
+  defp maybe_save_accordion_state(js, false, _id), do: js
+
+   @doc false
+   def toggle_disclosure(target_id) when is_binary(target_id) do
     %JS{}
     |> JS.toggle_attribute({"aria-expanded", "true", "false"})
     |> JS.toggle_attribute({"hidden", "hidden"}, to: "##{target_id}")
